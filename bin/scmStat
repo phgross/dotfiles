@@ -65,6 +65,7 @@ def show_status(show_tags, show_ahead):
     dirs = os.listdir('.')
     dirs = filter(lambda x:not x.startswith('.'), dirs)
     dirs = filter(lambda x:os.path.isdir(x), dirs)
+    dirs = filter(lambda x:not os.path.islink(x), dirs)
     dirs.sort()
 
     table = ASCIITable(*[ColorString(x, 'yellow_bold') for x in
@@ -79,7 +80,7 @@ def show_status(show_tags, show_ahead):
         branch = ''
         latest = ''
         if isSvn:
-            if len(runcmd('svn status %s' % dir)) > 0:
+            if os.path.isdir(dir + '.svn'):
                 changes = ColorString(' !', 'red_bold')
             url = runcmd('svn info %s | grep URL | cut -d " " -f 2' % dir)[0].strip().split('/')
             if url[-1]=='trunk':
