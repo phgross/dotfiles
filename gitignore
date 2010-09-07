@@ -1,6 +1,4 @@
 *.class
-*.mo
-*.pyc
 *.swo
 *.swp
 .DS_Store

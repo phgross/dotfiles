@@ -67,3 +67,7 @@ bindkey "^J"    self-insert             # Shift-Enter for \n
 bindkey "^W"    delete-word             # Ctrl+W
 bindkey "^D"    backward-delete-word    # Ctrl+D
 bindkey "^O"    overwrite-mode          # Ctrl+O
+
+# configuration for emacs multi-term.el compatibility
+bindkey "\ef"    forward-word
+bindkey "\eb"    backward-word
