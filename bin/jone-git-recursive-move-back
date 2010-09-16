@@ -1,0 +1,89 @@
+#!/usr/bin/python2.6
+
+import sys
+import os
+import re
+from datetime import datetime
+
+
+help = '''Recursive git-checkout until a specific date in the past.
+Usage Example: jone-git-recursive-move-back 2010-09-23
+Usage Example: jone-git-recursive-move-back 2010-09-23 19:27'''
+
+# helper method
+def runcmd(cmd, log=False, respond=True):
+    if log:
+        print '  >', cmd
+    if respond:
+        p = os.popen(cmd, 'r')
+        l = p.readlines()
+        p.close()
+        return l
+    else:
+        return os.system(cmd)
+
+
+# help if no argument
+
+if len(sys.argv) < 2:
+    print help
+    sys.exit(0)
+
+# validate date
+if len(sys.argv) == 3:
+    try:
+        until = datetime.strptime(' '.join((sys.argv[1], sys.argv[2])),
+                              '%Y-%m-%d %H:%M')
+    except ValueError:
+        print help
+        sys.exit(0)
+elif len(sys.argv) == 2:
+    try:
+        until = datetime.strptime((sys.argv[1]), '%Y-%m-%d')
+    except ValueError:
+        print help
+        sys.exit(0)
+
+# search all git repos / packages with git
+paths = [os.path.abspath('/'.join(path.strip().split('/')[:-1]))
+         for path
+         in runcmd('find . -name .git')]
+
+date_search_xpr = re.compile('Date:(.*)')
+for pkg_path in paths:
+    commits = ''.join(runcmd('cd %s ; git log' % pkg_path)).strip().split('commit')
+
+    pkg = pkg_path.split('/')[-1]
+
+    pkg_moved_back = False
+    
+    for commit in commits[:3]:
+        if not len(commit):
+            continue
+        
+        date_match = date_search_xpr.search(commit)
+        if not date_match:
+            # commit not containing a date -> not a real commit
+            continue
+        
+        # Wed Sep 8 09:27:43 2010 +0200
+        date_string = date_match.groups()[0].strip()
+        try:
+            date = datetime.strptime(date_string, '%a %b %d %H:%M:%S %Y +0200')
+        except ValueError:
+            # could not parse date
+            continue
+        
+        if date > until:
+            continue
+        else:
+            ref = commit.strip().split()[0]
+            print '\n\n', pkg, '\n', len(pkg) * '-'
+            runcmd('cd %s ; git checkout %s' % (pkg_path, ref), log=False, respond=True)
+            pkg_moved_back = True
+            print commit
+            break
+
+    if not pkg_moved_back:
+        print '\n\n', pkg
+        print 'WARNING: no appropriate commit found'
