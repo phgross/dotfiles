@@ -8,7 +8,8 @@ from datetime import datetime
 
 help = '''Recursive git-checkout until a specific date in the past.
 Usage Example: jone-git-recursive-move-back 2010-09-23
-Usage Example: jone-git-recursive-move-back 2010-09-23 19:27'''
+Usage Example: jone-git-recursive-move-back 2010-09-23 19:27
+Revert: jone-git-recursive-move-back master'''
 
 # helper method
 def runcmd(cmd, log=False, respond=True):
@@ -29,20 +30,25 @@ if len(sys.argv) < 2:
     print help
     sys.exit(0)
 
+reset = False
+
 # validate date
 if len(sys.argv) == 3:
     try:
         until = datetime.strptime(' '.join((sys.argv[1], sys.argv[2])),
-                              '%Y-%m-%d %H:%M')
+                                  '%Y-%m-%d %H:%M')
     except ValueError:
         print help
         sys.exit(0)
 elif len(sys.argv) == 2:
-    try:
-        until = datetime.strptime((sys.argv[1]), '%Y-%m-%d')
-    except ValueError:
-        print help
-        sys.exit(0)
+    if sys.argv[1].strip() == 'master':
+        reset = True
+    else:
+        try:
+            until = datetime.strptime((sys.argv[1]), '%Y-%m-%d')
+        except ValueError:
+            print help
+            sys.exit(0)
 
 # search all git repos / packages with git
 paths = [os.path.abspath('/'.join(path.strip().split('/')[:-1]))
@@ -51,21 +57,33 @@ paths = [os.path.abspath('/'.join(path.strip().split('/')[:-1]))
 
 date_search_xpr = re.compile('Date:(.*)')
 for pkg_path in paths:
-    commits = ''.join(runcmd('cd %s ; git log' % pkg_path)).strip().split('commit')
 
     pkg = pkg_path.split('/')[-1]
 
+    if reset:
+        branch = filter(lambda l:l.strip().startswith('*'),
+                        runcmd('cd %s ; git branch' %
+                               pkg_path, log=False, respond=True))[0].strip()
+        if branch == '* (no branch)':
+            print '\n\n', pkg, '\n', len(pkg) * '-'
+            runcmd('cd %s ; git checkout master' % pkg_path, log=False, respond=True)
+            print 'RESET'
+        continue
+
+    commits = ''.join(runcmd('cd %s ; git log' % pkg_path)
+                      ).strip().split('commit')
+
     pkg_moved_back = False
-    
+
     for commit in commits[:3]:
         if not len(commit):
             continue
-        
+
         date_match = date_search_xpr.search(commit)
         if not date_match:
             # commit not containing a date -> not a real commit
             continue
-        
+
         # Wed Sep 8 09:27:43 2010 +0200
         date_string = date_match.groups()[0].strip()
         try:
@@ -73,7 +91,7 @@ for pkg_path in paths:
         except ValueError:
             # could not parse date
             continue
-        
+
         if date > until:
             continue
         else:
