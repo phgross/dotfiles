@@ -1,6 +1,6 @@
 [user]
-	name = Jonas Baumann
-	email = jone@jone.ch
+	name = <%= print("Your Name: "); STDOUT.flush; STDIN.gets.chomp %>
+	email = <%= print("Your Email: "); STDOUT.flush; STDIN.gets.chomp %>
 [alias]
 	co = checkout
 [color]
@@ -8,7 +8,7 @@
 	status = auto
 	branch = auto
 [core]
-	excludesfile = /Users/jone/.gitignore
+	excludesfile = <%= ENV['HOME'] %>/.gitignore
 	editor = /usr/bin/emacsclient
 	autocrlf = input
 [apply]
@@ -16,7 +16,7 @@
 [format]
 	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 [github]
-	user = jone
-	token = 6a91e7c06626a591d9f0da0b843d729a
+	user = <%= print("GitHub Username: "); STDOUT.flush; STDIN.gets.chomp %>
+	token = <%= print("GitHub API Token: "); STDOUT.flush; STDIN.gets.chomp %>
 [mergetool.ediff]
     cmd = /usr/bin/emacsclient --eval \"(progn  (defun ediff-write-merge-buffer ()    (let ((file ediff-merge-store-file))      (set-buffer ediff-buffer-C)      (write-region (point-min) (point-max) file)      (message \\\"Merge buffer saved in: %s\\\" file)      (set-buffer-modified-p nil)      (sit-for 1)))  (setq ediff-quit-merge-hook 'ediff-write-merge-buffer)   (ediff-merge-files-with-ancestor \\\"$LOCAL\\\" \\\"$REMOTE\\\"                                   \\\"$BASE\\\" nil \\\"$MERGED\\\"))\"
