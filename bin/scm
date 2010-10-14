@@ -75,7 +75,10 @@ class SCM(object):
         """
         Add *.egg-info to gitignores
         """
-        current = open('.gitignore').read()
+        if os.path.isfile('.gitignore'):
+            current = open('.gitignore').read()
+        else:
+            current = ''
         if 'egg-info' not in current:
             runcmd('echo "\n*.egg-info" >> .gitignore')
         if '.mo' not in current:
