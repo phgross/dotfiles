@@ -116,7 +116,7 @@ def show_status(show_tags, show_ahead):
                 branch = ColorString(branch, 'green')
             else:
                 branch = ColorString(branch, 'yellow_bold')
-            if show_tags:
+            if show_tags and isGitSvn:
                 tags = []
                 for tag in [x.strip() for x in runcmd(r'cd %s ; git branch -a | grep tags | cut -d "/" -f 3' % dir)]:
                     if tag[0]=='v':
@@ -125,8 +125,12 @@ def show_status(show_tags, show_ahead):
                 tags.sort()
                 if len(tags)>0:
                     latest = tags[-1]
+            elif show_tags and isGit:
+                tags = [x.strip() for x in runcmd(r'cd %s ; git tag' % dir)]
+                if len(tags):
+                    latest = tags[-1]
             else:
-                '-'
+                latest = '-'
         table.push((
                 isGitSvn and ColorString('git-svn', 'yellow') or \
                     isGit and ColorString('git', 'green') or \
