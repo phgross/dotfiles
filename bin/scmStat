@@ -160,7 +160,7 @@ def pull():
         elif isGit and isGitSvn:
             cmd = 'cd %s ; git svn fetch; git svn rebase' % dir
         elif isGit:
-            cmd = 'cd %s ; git pull' % dir
+            cmd = 'cd %s ; git pull --rebase' % dir
         print '  %', cmd
         print ''.join(runcmd(cmd)).strip()
         print ''
