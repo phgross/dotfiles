@@ -68,9 +68,11 @@ def show_status(show_tags, show_ahead):
     dirs = filter(lambda x:not os.path.islink(x), dirs)
     dirs.sort()
 
-    table = ASCIITable(*[ColorString(x, 'yellow_bold') for x in
-                         ('SCM', 'CHG', 'DIR', 'BRANCH', 'LATEST')
-                         ])
+    headlines = ['SCM', 'CHG', 'DIR', 'BRANCH']
+    if show_tags:
+        headlines += ['LATEST', 'UNTAGGED']
+
+    table = ASCIITable(*[ColorString(x, 'yellow_bold') for x in headlines])
 
     for dir in dirs:
         isSvn = os.path.isdir(os.path.join(dir, '.svn'))
@@ -79,6 +81,8 @@ def show_status(show_tags, show_ahead):
         changes = ''
         branch = ''
         latest = ''
+        untagged = ''
+
         if isSvn:
             if show_ahead and runcmd('svn st %s' % dir):
                 changes = ColorString(' !', 'red_bold')
@@ -91,6 +95,11 @@ def show_status(show_tags, show_ahead):
                 branch = ColorString('/'.join(url[-2:]), 'green_bold')
             else:
                 branch = ColorString(url[-1] + ' (?)', 'red_bold')
+
+            # untagged changes?
+            if show_tags:
+                untagged = 'unsupported'
+
         if isGit:
             if 'nothing to commit' not in ''.join(runcmd('cd %s;git status' % dir)):
                 changes = '!'
@@ -105,6 +114,7 @@ def show_status(show_tags, show_ahead):
                     ahead = len([chg for chg in log if 'git-svn-id:' not in chg]) - 1
                     if ahead==4:
                         ahead = '*'
+
             if changes and (isinstance(ahead, str) or ahead > 0):
                 changes = ColorString(changes, 'red_bold') + ' ' + ColorString('%i' % ahead, 'yellow_bold')
             elif changes:
@@ -116,6 +126,7 @@ def show_status(show_tags, show_ahead):
                 branch = ColorString(branch, 'green')
             else:
                 branch = ColorString(branch, 'yellow_bold')
+
             if show_tags and isGitSvn:
                 tags = []
                 for tag in [x.strip() for x in runcmd(r'cd %s ; git branch -a | grep tags | cut -d "/" -f 3' % dir)]:
@@ -125,21 +136,33 @@ def show_status(show_tags, show_ahead):
                 tags.sort()
                 if len(tags)>0:
                     latest = tags[-1]
+
             elif show_tags and isGit:
                 tags = [x.strip() for x in runcmd(r'cd %s ; git tag' % dir)]
                 if len(tags):
                     latest = tags[-1]
             else:
                 latest = '-'
-        table.push((
-                isGitSvn and ColorString('git-svn', 'yellow') or \
+
+            # untagged changes?
+            cmd = [r'cd %s ; ' % dir,
+                   r'git diff %s --name-only %s/*' % (
+                    latest,
+                    dir.split('.', 1)[0]),
+                   r' | grep -v "/version.txt$"']
+            if len(''.join(runcmd(''.join(cmd))).strip()):
+                untagged = ColorString('YES', 'yellow')
+
+
+        cols = [isGitSvn and ColorString('git-svn', 'yellow') or \
                     isGit and ColorString('git', 'green') or \
                     isSvn and ColorString('svn', 'red') or '',
                 changes,
                 dir,
-                branch,
-                latest
-                ))
+                branch]
+        if show_tags:
+            cols += [latest, untagged]
+        table.push(cols)
     table()
 
 def pull():
