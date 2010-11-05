@@ -1,0 +1,79 @@
+#!/opt/local/bin/python2.6
+
+"""
+Script for generating a graph of dependencies.
+Run it in a src/ directory.
+"""
+
+import sys
+import os
+import distutils.core
+import re
+from datetime import datetime
+import pygraphviz as pgv
+
+
+# helper method
+def runcmd(cmd, log=False, respond=True):
+    if log:
+        print '  >', cmd
+    if respond:
+        p = os.popen(cmd, 'r')
+        l = p.readlines()
+        p.close()
+        return l
+    else:
+        return os.system(cmd)
+
+def get_egg(setup_py_path):
+    oridir = os.getcwd()
+    os.chdir(os.path.dirname(setup_py_path))
+    try:
+        egg = distutils.core.run_setup('setup.py')
+    except:
+        os.chdir(oridir)
+        raise
+    else:
+        os.chdir(oridir)
+        return egg
+
+graph = pgv.AGraph(directed=True)
+
+map = {}
+
+for setup_py_path in runcmd('find . -name setup.py'):
+    setup_py_path = setup_py_path.strip()
+    try:
+        egg = get_egg(setup_py_path)
+    except Exception, e:
+        print 'FAILED', setup_py_path, ':', str(e)
+        continue
+    map[egg.get_name()] = egg.install_requires
+
+# cleanup
+for pkg, deps in map.items():
+    new_deps = []
+    for name in deps:
+        if '[' in name or ' ' in name:
+            name = name.split(' ', 1)[0].split(']', 1)[0]
+        if name in map.keys():
+            new_deps.append(name)
+    map[pkg] = new_deps
+
+for pkg in map.keys():
+    graph.add_node(pkg)
+
+for pkg, dependencies in map.items():
+    for name in dependencies:
+        attrs = {}
+        if pkg in map[name]:
+            attrs['color'] = 'red'
+        graph.add_edge(pkg, name, **attrs)
+
+graph.write('dependencies.dot')
+print 'created dependencies.dot'
+graph.layout()
+filename = 'dependencies.pdf'
+graph.draw(filename, prog='circo', format='pdf')
+# graph.draw(filename, prog='dot', format='pdf')
+print 'created %s' % filename
