@@ -1,4 +1,4 @@
-# 
+#
 
 PS1='%3~$(git_branch_for_prompt)%# '
 #PS1='%3~$(git_branch_for_prompt)$%# '
@@ -24,8 +24,8 @@ fpath=(~/.zsh/functions $fpath)
 autoload -U ~/.zsh/functions/*(:t)
 
 HISTFILE=~/.zsh_history
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=100
+SAVEHIST=100
 
 setopt NO_BEEP
 setopt NO_BG_NICE # don't nice background tasks
