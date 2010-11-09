@@ -142,16 +142,29 @@ def show_status(show_tags, show_ahead):
                 if len(tags):
                     latest = tags[-1]
             else:
-                latest = '-'
+                latest = ''
 
-            # untagged changes?
-            cmd = [r'cd %s ; ' % dir,
-                   r'git diff %s --name-only %s/*' % (
-                    latest,
-                    dir.split('.', 1)[0]),
-                   r' | grep -v "/version.txt$"']
-            if len(''.join(runcmd(''.join(cmd))).strip()):
-                untagged = ColorString('YES', 'yellow')
+            if show_tags and not isGitSvn:
+                # untagged changes?
+                if os.path.isdir(os.path.join(dir, dir.split('.', 1)[0])):
+                    cmd = [r'cd %s ; ' % dir,
+                       r'git diff %s --name-only %s/*' % (
+                        latest,
+                        dir.split('.', 1)[0]),
+                       r' | grep -v "/version.txt$"']
+                elif os.path.isdir(os.path.join(dir, 'src', dir.split('.', 1)[0])):
+                    cmd = [r'cd %s ; ' % dir,
+                       r'git diff %s --name-only src/%s/*' % (
+                        latest,
+                        dir.split('.', 1)[0]),
+                       r' | grep -v "/version.txt$"']
+                else:
+                    cmd = None
+                if cmd:
+                    if len(''.join(runcmd(''.join(cmd))).strip()):
+                        untagged = ColorString('YES', 'yellow')
+                else:
+                    untagged = ColorString('error', 'red_bold')
 
 
         cols = [isGitSvn and ColorString('git-svn', 'yellow') or \
