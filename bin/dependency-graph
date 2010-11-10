@@ -3,6 +3,8 @@
 """
 Script for generating a graph of dependencies.
 Run it in a src/ directory.
+
+You need to have pygraphviz / graphviz installed.
 """
 
 import sys
@@ -10,7 +12,21 @@ import os
 import distutils.core
 import re
 from datetime import datetime
-import pygraphviz as pgv
+
+try:
+    import pygraphviz as pgv
+except ImportError:
+    print 'ERROR: could not import pygraphviz.'
+    print ''
+    print 'INSTALLATION:'
+    print '- download graphviz from http://www.graphviz.org/Download..php'
+    print '- download (!) the packge pygraphviz from ' + \
+        'http://pypi.python.org/pypi/pygraphviz'
+    print '- unzip'
+    print '- edit the setup.py: uncomment lines "library_path" ' + \
+        'and "include_path" for your operating system'
+    print '- run: python setup.py install'
+    sys.exit(0)
 
 
 # helper method
