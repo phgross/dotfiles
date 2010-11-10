@@ -39,10 +39,10 @@ def get_egg(setup_py_path):
 
 graph = pgv.AGraph(directed=True, layout='dot', mindist=1, mclimit=10, sep="0.01",
                    outputorder="breadthfirst", rankdir="LR", size="20!",
-                   splines=True, fontsize=14, concentrate=True,
+                   splines=True, fontsize=14, concentrate=False,
                    nodesep="0.25", normalize=False)
 graph.node_attr.update(shape='tab', fontsize=18)
-graph.edge_attr.update(weight=2, decorate=False)
+graph.edge_attr.update(decorate=False)
 
 map = {}
 
@@ -65,16 +65,30 @@ for pkg, deps in map.items():
             new_deps.append(name)
     map[pkg] = new_deps
 
-for pkg in map.keys():
+
+node_names = map.keys()
+node_names.sort()
+for pkg in node_names:
     graph.add_node(pkg)
 
-for pkg, dependencies in map.items():
+for pkg in node_names:
+    dependencies = map[pkg]
     for name in dependencies:
         attrs = {}
-        if pkg in map[name]:
-            attrs['color'] = 'red'
-        graph.add_edge(pkg, name, **attrs)
+        graph.add_edge(pkg, name, color='grey50')
 
+def depth_first_search(map, vertex, marked_vertices):
+    marked_vertices.append(vertex)
+    for target in map[vertex]:
+        if target not in marked_vertices:
+            depth_first_search(map, target, marked_vertices)
+        elif marked_vertices.index(target) == 0:
+            color = 'red'
+            graph.add_edge(vertex, target, color=color, style='bold')
+
+
+for pkg in node_names:
+    depth_first_search(map, pkg, [])
 
 
 
@@ -83,5 +97,4 @@ print 'created dependencies.dot'
 graph.layout()
 filename = 'dependencies.pdf'
 graph.draw(filename, prog='dot', format='pdf')
-# graph.draw(filename, prog='dot', format='pdf')
 print 'created %s' % filename
