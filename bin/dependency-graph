@@ -37,7 +37,12 @@ def get_egg(setup_py_path):
         os.chdir(oridir)
         return egg
 
-graph = pgv.AGraph(directed=True)
+graph = pgv.AGraph(directed=True, layout='dot', mindist=1, mclimit=10, sep="0.01",
+                   outputorder="breadthfirst", rankdir="LR", size="20!",
+                   splines=True, fontsize=14, concentrate=True,
+                   nodesep="0.25", normalize=False)
+graph.node_attr.update(shape='tab', fontsize=18)
+graph.edge_attr.update(weight=2, decorate=False)
 
 map = {}
 
@@ -70,10 +75,13 @@ for pkg, dependencies in map.items():
             attrs['color'] = 'red'
         graph.add_edge(pkg, name, **attrs)
 
+
+
+
 graph.write('dependencies.dot')
 print 'created dependencies.dot'
 graph.layout()
 filename = 'dependencies.pdf'
-graph.draw(filename, prog='circo', format='pdf')
+graph.draw(filename, prog='dot', format='pdf')
 # graph.draw(filename, prog='dot', format='pdf')
 print 'created %s' % filename
