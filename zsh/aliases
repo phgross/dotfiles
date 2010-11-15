@@ -49,6 +49,7 @@ alias gs='git status'
 alias gsm='git submodule init'
 alias gso='git show'
 alias gsv='git svn'
+alias gr='git remote'
 
 # subversion
 alias setSvnExternals='svn propset svn:externals -F ./EXTERNALS.TXT .'
