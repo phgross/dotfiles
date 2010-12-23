@@ -1,26 +1,26 @@
 [user]
-	name = <%= print("Your Name: "); STDOUT.flush; STDIN.gets.chomp %>
-	email = <%= print("Your Email: "); STDOUT.flush; STDIN.gets.chomp %>
+    name = <%= print("Your Name: "); STDOUT.flush; STDIN.gets.chomp %>
+    email = <%= print("Your Email: "); STDOUT.flush; STDIN.gets.chomp %>
 [alias]
-	co = checkout
+    co = checkout
 [color]
-	diff = auto
-	status = auto
-	branch = auto
+    diff = auto
+    status = auto
+    branch = auto
 [core]
-	excludesfile = <%= ENV['HOME'] %>/.gitignore
-	editor = /Applications/Emacs.app/Contents/MacOS/bin/emacsclient
-	autocrlf = input
+    excludesfile = <%= ENV['HOME'] %>/.gitignore
+    editor = open -We
+    autocrlf = input
 [apply]
-	whitespace = nowarn
+    whitespace = nowarn
 [format]
-	pretty = %C(yellow)%h%Creset %s (%C(red)%cr%Creset, %C(yellow)%an%Creset)%Creset
+    pretty = %C(yellow)%h%Creset %s (%C(red)%cr%Creset, %C(yellow)%an%Creset)%Creset
 [github]
-	user = <%= print("GitHub Username: "); STDOUT.flush; STDIN.gets.chomp %>
-	token = <%= print("GitHub API Token: "); STDOUT.flush; STDIN.gets.chomp %>
+    user = <%= print("GitHub Username: "); STDOUT.flush; STDIN.gets.chomp %>
+    token = <%= print("GitHub API Token: "); STDOUT.flush; STDIN.gets.chomp %>
 [mergetool.ediff]
-    cmd = /Applications/Emacs.app/Contents/MacOS/bin/emacsclient --eval \"(progn  (defun ediff-write-merge-buffer ()    (let ((file ediff-merge-store-file))      (set-buffer ediff-buffer-C)      (write-region (point-min) (point-max) file)      (message \\\"Merge buffer saved in: %s\\\" file)      (set-buffer-modified-p nil)      (sit-for 1)))  (setq ediff-quit-merge-hook 'ediff-write-merge-buffer)   (ediff-merge-files-with-ancestor \\\"$LOCAL\\\" \\\"$REMOTE\\\"                                   \\\"$BASE\\\" nil \\\"$MERGED\\\"))\"
+    cmd = /usr/bin/emacsclient --eval \"(progn  (defun ediff-write-merge-buffer ()    (let ((file ediff-merge-store-file))      (set-buffer ediff-buffer-C)      (write-region (point-min) (point-max) file)      (message \\\"Merge buffer saved in: %s\\\" file)      (set-buffer-modified-p nil)      (sit-for 1)))  (setq ediff-quit-merge-hook 'ediff-write-merge-buffer)   (ediff-merge-files-with-ancestor \\\"$LOCAL\\\" \\\"$REMOTE\\\"                                   \\\"$BASE\\\" nil \\\"$MERGED\\\"))\"
 [push]
-  default = tracking
+    default = tracking
 [branch]
-  autosetuprebase = always
+    autosetuprebase = always
