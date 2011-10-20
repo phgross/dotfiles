@@ -3,7 +3,7 @@
 # Setting the path for MacPorts.
 export PATH=/opt/subversion/bin:$PATH
 export PATH=$HOME/bin:$HOME/.bin:$HOME/.willgit/bin:$PATH
-export VISUAL=vi
+export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
 export PS1='\033[01;32m\]\u\033[00m\]:\033[0;33m\]`echo \$prompt`\033[00m\]:\w\033[0;33m\]\$ \033[00m\]'
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
