@@ -20,10 +20,10 @@ alias d='mvimdiff'
 # Apache / mysql
 alias amstart='sudo /opt/local/apache2/bin/apachectl start; sudo /opt/local/bin/mysqld_safe5 &'
 alias apache2ctl='sudo /opt/local/apache2/bin/apachectl'
-alias mysqlstart='sudo mysqld_safe5 &'
-alias mysqlstop='mysqladmin5 -u root shutdown'
-alias mysql='mysql5'
 alias fakemail='sudo ~/bin/fakemail.py --host=localhost --port=25 --path=/Users/jone/temp/mails --background'
+alias mysqlstart='sudo /opt/local/bin/mysqld_safe5 &'
+alias mysqlstop='/opt/local/bin/mysqladmin5 -u root -p shutdown'
+alias rmysql="mysql5 -u'root'"
 
 # rails
 alias rss='script/server'
@@ -57,7 +57,8 @@ alias gsm='git submodule init'
 alias gso='git show'
 alias gsv='git svn'
 alias gt='git tag'
-
+alias gpush='git push'
+alias gcu='echo -n `git remote show origin | grep "Fetch URL" | cut -d " " -f 5`|pbcopy'
 
 # subversion
 alias setSvnExternals='svn propset svn:externals -F ./EXTERNALS.TXT .'
@@ -142,3 +143,6 @@ alias -s tsk=taskcoach
 
 # phone remote control
 alias phone_accept='curl "http://192.168.1.66/adr.htm?number=33"'
+
+#Zug VPN
+alias fixvpntoken='sudo /usr/sbin/pcscd -df' 
